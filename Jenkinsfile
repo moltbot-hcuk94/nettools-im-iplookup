@@ -40,31 +40,32 @@ pipeline {
           def composeFile = isProd ? 'docker-compose.yml' : 'docker-compose.staging.yml'
 
           // Compose command: try v2 ("docker compose") then fall back to v1 ("docker-compose")
-          def remoteScript = """
+          // Use single-quoted string to prevent Groovy interpolation - these are bash variables
+          def remoteScript = '''
             set -euo pipefail
 
-            cd "${APP_DIR}"
+            cd "$APP_DIR"
 
-            echo "==> Pulling latest code for branch: ${BRANCH}"
+            echo "==> Pulling latest code for branch: $BRANCH"
             # Ensure we're on the right branch and up to date
             git fetch --prune
-            git checkout "${BRANCH}"
-            git reset --hard "origin/${BRANCH}"
+            git checkout "$BRANCH"
+            git reset --hard "origin/$BRANCH"
 
-            echo "==> Rebuilding and restarting containers using ${COMPOSE_FILE}"
+            echo "==> Rebuilding and restarting containers using $COMPOSE_FILE"
             if docker compose version >/dev/null 2>&1; then
-              docker compose -f "${COMPOSE_FILE}" pull || true
-              docker compose -f "${COMPOSE_FILE}" build --pull
-              docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans
+              docker compose -f "$COMPOSE_FILE" pull || true
+              docker compose -f "$COMPOSE_FILE" build --pull
+              docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
             else
-              docker-compose -f "${COMPOSE_FILE}" pull || true
-              docker-compose -f "${COMPOSE_FILE}" build --pull
-              docker-compose -f "${COMPOSE_FILE}" up -d --remove-orphans
+              docker-compose -f "$COMPOSE_FILE" pull || true
+              docker-compose -f "$COMPOSE_FILE" build --pull
+              docker-compose -f "$COMPOSE_FILE" up -d --remove-orphans
             fi
 
             echo "==> Pruning unused images (safe-ish cleanup)"
             docker image prune -f || true
-          """
+          '''
 
           withCredentials([
             string(credentialsId: serverCred, variable: 'SERVER_NAME'),
