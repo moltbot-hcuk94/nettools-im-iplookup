@@ -32,7 +32,11 @@ function proxyForUrl(urlStr) {
 }
 
 export async function fetchRdap({ ip, baseUrl, signal }) {
-  const url = new URL(encodeURIComponent(ip), baseUrl).toString();
+  // RDAP endpoints expect the IP literal in the path.
+  // Using encodeURIComponent() breaks some RDAP servers for IPv6 because it encodes ':' as '%3A'.
+  // Encode conservatively but keep ':' intact.
+  const ipPath = encodeURIComponent(ip).replaceAll('%3A', ':');
+  const url = new URL(ipPath, baseUrl).toString();
   const proxy = proxyForUrl(url);
   const dispatcher = proxy ? new ProxyAgent(proxy) : undefined;
 
