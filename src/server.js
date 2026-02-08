@@ -126,6 +126,12 @@ app.get('/lookup', async (req, res, next) => {
     res.json({
       ip,
       ipClassification: ipClass,
+      rateLimit: {
+        limit: state2.limit,
+        used: Math.max(0, state2.limit - state2.remaining),
+        remaining: state2.remaining,
+        resetDay: state2.day
+      },
       rdap: rdapResult.rdap,
       rdapSource: rdapResult.source,
       rdapFetchedAt: rdapResult.fetchedAt,
