@@ -13,7 +13,8 @@ services:
       RATE_LIMIT_DAILY: ${RATE_LIMIT_DAILY:-24}
       SQLITE_PATH: ${SQLITE_PATH:-/data/app.sqlite}
       RDAP_CACHE_TTL_SECONDS: ${RDAP_CACHE_TTL_SECONDS:-86400}
-      RDAP_BASE_URL: ${RDAP_BASE_URL:-https://rdap.org/ip/}
+      # Optional override. Leave blank to use IANA bootstrap -> registry RDAP directly.
+      RDAP_BASE_URL: ${RDAP_BASE_URL:-}
       GEOIP_DB_DIR: ${GEOIP_DB_DIR:-/data/geoip}
       GEOIP_CITY_MMDB: ${GEOIP_CITY_MMDB:-GeoLite2-City.mmdb}
       GEOIP_ASN_MMDB: ${GEOIP_ASN_MMDB:-GeoLite2-ASN.mmdb}

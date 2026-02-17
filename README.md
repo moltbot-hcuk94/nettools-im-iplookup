@@ -5,7 +5,7 @@ Dockerized IP lookup API for **nettools.im**.
 ## Features
 
 - **GET /lookup?ip=** → combines:
-  - **RDAP** lookup (via `https://rdap.org/ip/{ip}`)
+  - **RDAP** lookup (via IANA bootstrap → query the correct registry RDAP service directly)
   - **MaxMind GeoLite2** ASN + City (if `.mmdb` present)
 - **SQLite** caching for RDAP responses
 - **Per-client rate limiting**: **24 requests / day** (by `req.ip`)
@@ -51,7 +51,7 @@ Response:
 | `CORS_ALLOWLIST` | `https://nettools.im,https://www.nettools.im` | Comma-separated origins |
 | `SQLITE_PATH` | `/data/app.sqlite` | SQLite file (RDAP cache + rate limits) |
 | `RDAP_CACHE_TTL_SECONDS` | `86400` | RDAP cache TTL |
-| `RDAP_BASE_URL` | `https://rdap.org/ip/` | RDAP base URL |
+| `RDAP_BASE_URL` | *(empty)* | Optional RDAP base URL override. Leave empty to use IANA bootstrap (recommended). |
 | `RATE_LIMIT_DAILY` | `24` | Requests per client per UTC day |
 | `GEOIP_DB_DIR` | `/data/geoip` | Directory for `.mmdb` files |
 | `GEOIP_CITY_MMDB` | `GeoLite2-City.mmdb` | Filename in `GEOIP_DB_DIR` |
