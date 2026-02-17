@@ -61,14 +61,27 @@ export async function fetchRdap({ ip, baseUrl, signal }) {
   const proxy = proxyForUrl(url);
   const dispatcher = proxy ? new ProxyAgent(proxy) : undefined;
 
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/rdap+json, application/json;q=0.9, */*;q=0.1'
-    },
-    signal,
-    ...(dispatcher ? { dispatcher } : {})
-  });
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/rdap+json, application/json;q=0.9, */*;q=0.1'
+      },
+      signal,
+      ...(dispatcher ? { dispatcher } : {})
+    });
+  } catch (e) {
+    // Network/TLS/DNS failures throw (TypeError: fetch failed). Surface as 502.
+    const err = new Error('RDAP fetch failed');
+    err.status = 502;
+    err.body = {
+      code: 'rdap_fetch_failed',
+      url,
+      cause: String(e?.cause?.message || e?.message || e)
+    };
+    throw err;
+  }
   const text = await res.text();
   let json = null;
   try {
